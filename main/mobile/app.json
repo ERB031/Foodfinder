@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "Foodfinder",
+    "slug": "foodfinder",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"]
+  }
+}
