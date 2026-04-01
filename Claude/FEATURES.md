@@ -19,36 +19,38 @@ Features are organized by priority tier. Each tier builds on the previous one.
 - View all reviews for a restaurant
 - Basic restaurant search by name
 
-### Create & View Reviews
-- Write a review for a restaurant (rating 1-5, title, body)
-- Attach up to 5 photos per review
-- View review detail page
-- Edit and delete own reviews
+### Create & View Recommendations
+- Recommend a restaurant or specific dish (positive only — no negative reviews)
+- Add notes: free-text commentary explaining why you love it, tips, what to order
+- Recommend specific dishes by name (creates dish entries organically)
+- Attach up to 5 photos per recommendation
+- View recommendation detail page
+- Edit and delete own recommendations
 - Visit date (optional)
 
 ### Basic Feed
-- Reverse-chronological feed of all reviews (global, no personalization)
+- Reverse-chronological feed of all recommendations (global, no personalization)
 - Pull-to-refresh
 - Infinite scroll with cursor-based pagination
 
 ### Basic Moderation
-- Community flag button on reviews
-- Admin dashboard to view flagged reviews and approve/reject
+- Community flag button on recommendations
+- Admin dashboard to view flagged content and approve/reject
 
 ---
 
 ## P1 — Core Experience
 
-### Dish-Level Reviews
-- Create dishes tied to restaurants (when writing a review)
-- Review a specific dish (not just the restaurant)
-- View all reviews for a specific dish
-- "Popular dishes" section on restaurant page
+### Dish-Level Recommendations
+- Recommend specific dishes at restaurants (dishes created organically)
+- View all recommendations for a specific dish
+- "Most Recommended Dishes" section on restaurant page
+- Dish cards show: name, photo, number of chef recommendations, top notes
 
 ### Follow Chefs
 - Follow/unfollow other chefs
 - Follower/following counts on profiles
-- Feed becomes personalized: followed chefs' reviews appear first
+- Feed becomes personalized: followed chefs' recommendations appear first
 
 ### Photo Experience
 - Photo gallery in reviews (swipeable)
@@ -81,20 +83,16 @@ Features are organized by priority tier. Each tier builds on the previous one.
 - In-app notification center
 - Notification preferences
 
-### Chef's Pick
-- Binary "Chef's Pick" badge on reviews (in addition to 1-5 rating)
-- "Chef's Picks" collection on profile page
-- "Chef's Picks" filter on restaurant page
-
 ### Trending & Stats
-- Trending restaurants (most reviewed in past 7 days)
-- Chef leaderboard (most reviews, most followed, by city)
-- Restaurant aggregate stats: average rating, expertise-weighted rating, review count
+- Trending restaurants (most recommended in past 7 days)
+- Trending dishes (most recommended in past 7 days)
+- Chef leaderboard (most recommendations, most followed, by city)
+- Restaurant stats: total recommendations, unique chefs, most recommended dishes
 
 ### Social Features
-- Like/save reviews
-- Share review via deep link
-- Comments on reviews (limited — this isn't social media)
+- Like/save recommendations
+- Share recommendation via deep link
+- Comments on recommendations (limited — this isn't social media)
 
 ---
 
@@ -102,14 +100,22 @@ Features are organized by priority tier. Each tier builds on the previous one.
 
 ### Restaurant Owner Portal
 - Claim restaurant ownership (verification required)
-- View analytics: review sentiment, visit trends, popular dishes
-- Respond to reviews (clearly labeled as restaurant response)
+- View analytics: recommendation trends, top dishes, visiting chefs
+- Thank chefs for recommendations (public, labeled as restaurant response)
 - Update restaurant info (hours, menu, photos)
 
 ### Monetization
-- Premium chef profiles (portfolio features, analytics)
-- Restaurant analytics dashboard (paid tier)
-- Affiliate reservation links
+- Premium chef profiles (portfolio features, analytics, priority placement in discovery)
+- Restaurant analytics dashboard (paid tier — read-only, no influence on recommendations)
+- Affiliate reservation links (OpenTable/Resy integration)
+- Featured chef partnerships (sponsored content, clearly labeled)
+
+### Chef Adoption & Incentives
+- Chef onboarding rewards (profile completeness milestones)
+- "Chef of the Month" spotlights by city
+- Professional portfolio export (PDF/link for job applications)
+- API access for chefs to embed recommendations on personal sites
+- Early access to new features for most active contributors
 
 ### Advanced Features
 - Video reviews (short-form, 30-60 seconds)

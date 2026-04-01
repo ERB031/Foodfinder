@@ -3,14 +3,13 @@
 ## Entity Relationship Overview
 
 ```
-Chef ─────< Review >───── Restaurant
-  │            │               │
-  │            │               │
-  │            ▼               │
-  │       ReviewPhoto          │
-  │                            │
-  │                            ▼
-  └────< Follow >────── Chef  Dish
+Chef ──────< Recommendation >───── Restaurant
+  │               │                     │
+  │               │                     │
+  │               ▼                     │
+  │        RecommendationPhoto          │
+  │                                     ▼
+  └─────< Follow >──────── Chef       Dish
 ```
 
 ## Core Entities
@@ -75,36 +74,37 @@ A specific menu item at a restaurant. Optional — reviews can target just the r
 | created_at | TIMESTAMP | |
 | updated_at | TIMESTAMP | |
 
-### Review
-The core content unit. A chef's assessment of a restaurant or specific dish.
+### Recommendation
+The core content unit. A positive endorsement — chefs share what they love. No negative reviews. Every recommendation is tied to a restaurant and optionally a specific dish.
 
 | Field | Type | Notes |
 |-------|------|-------|
 | id | UUID | Primary key |
 | chef_id | UUID | FK → Chef |
 | restaurant_id | UUID | FK → Restaurant |
-| dish_id | UUID | FK → Dish (nullable — restaurant-level review if null) |
-| rating | INTEGER | 1-5 scale |
-| title | VARCHAR(200) | Optional headline |
-| body | TEXT | Full review text |
+| dish_id | UUID | FK → Dish (nullable — restaurant-level rec if null) |
+| notes | TEXT | Free-text commentary: why they love it, tips, what to order |
 | visit_date | DATE | When the chef visited (nullable) |
 | moderation_status | ENUM | 'pending', 'approved', 'flagged', 'rejected' |
 | moderation_notes | TEXT | Internal notes from moderation |
 | created_at | TIMESTAMP | |
 | updated_at | TIMESTAMP | |
 
+**Key design choice:** No numeric rating. A recommendation IS the endorsement. If a chef doesn't recommend something, they simply don't post about it. This mirrors the original Chef's Feed model and eliminates rating noise.
+
 **Index notes:**
-- Composite index on (restaurant_id, created_at DESC) for restaurant review pages
+- Composite index on (restaurant_id, created_at DESC) for restaurant recommendation pages
 - Composite index on (chef_id, created_at DESC) for chef profile pages
+- Composite index on (dish_id, created_at DESC) for dish recommendation pages
 - Index on moderation_status for moderation queue
 
-### ReviewPhoto
-Photos attached to a review.
+### RecommendationPhoto
+Photos attached to a recommendation.
 
 | Field | Type | Notes |
 |-------|------|-------|
 | id | UUID | Primary key |
-| review_id | UUID | FK → Review |
+| recommendation_id | UUID | FK → Recommendation |
 | storage_key | VARCHAR(500) | S3 object key |
 | url | VARCHAR(500) | CDN URL |
 | thumbnail_url | VARCHAR(500) | Resized thumbnail CDN URL |
@@ -130,8 +130,8 @@ Materialized feed entries for read performance. Generated when reviews are creat
 |-------|------|-------|
 | id | UUID | Primary key |
 | recipient_chef_id | UUID | FK → Chef (who sees this in their feed) |
-| review_id | UUID | FK → Review |
-| author_chef_id | UUID | FK → Chef (who wrote the review) |
+| recommendation_id | UUID | FK → Recommendation |
+| author_chef_id | UUID | FK → Chef (who wrote the recommendation) |
 | relevance_score | DECIMAL(5,2) | Computed score for ordering |
 | feed_type | ENUM | 'following', 'trending', 'nearby', 'recommended' |
 | created_at | TIMESTAMP | |
@@ -139,11 +139,13 @@ Materialized feed entries for read performance. Generated when reviews are creat
 **Index notes:**
 - Composite index on (recipient_chef_id, relevance_score DESC, created_at DESC) for feed queries
 
-## Rating System Notes
+## Recommendation Model Notes
 
-The rating is a simple 1-5 integer, but display and aggregation should account for chef expertise:
-- A pastry chef's dessert review carries more weight than their steak review
-- This weighting is computed at query time using chef.specializations vs restaurant/dish cuisine
-- The weight multiplier is NOT stored on the review — it's derived
-- Aggregate restaurant ratings should show both raw average and expertise-weighted average
-- Consider: the original Chef's Feed used binary "recommended" instead of numeric. If numeric ratings prove noisy, pivot to a simpler system.
+There is no numeric rating. The act of recommending IS the endorsement. This mirrors the original Chef's Feed:
+
+- If a chef loves a dish, they post a recommendation with notes and photos
+- If they don't love it, they don't post — no negative reviews exist on the platform
+- A restaurant/dish's "score" is simply how many chefs recommended it
+- Chef expertise still matters for discovery: a pastry chef recommending a dessert is surfaced higher than a generalist recommending the same dessert
+- This expertise weighting uses chef.specializations vs restaurant/dish cuisine at query time
+- Notes are the primary content — they explain WHY the chef recommends this (e.g., "the tonkotsu broth is the best in the city, ask for extra chashu")

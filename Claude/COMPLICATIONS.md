@@ -83,56 +83,128 @@ This document captures the major complications of building a chef-driven restaur
 
 ---
 
-## 5. Rating System Design
+## 5. Positive-Only Recommendation Model
 
-**The problem:** A 1-5 star rating without context is noise. How do we make ratings meaningful when reviewers have different expertise levels?
+**Decision made:** No numeric ratings, no negative reviews. Chefs recommend what they love — if they don't love it, they don't post. This mirrors the original Chef's Feed.
 
-**Options:**
+**Why this works:**
+- Eliminates rating noise and "3.5 stars" meaninglessness
+- Removes most legal risk (no defamation from positive recommendations)
+- Makes restaurants allies, not adversaries — every mention is good press
+- Simplifies moderation dramatically
+- Creates a more pleasant content ecosystem
 
-| System | Pros | Cons |
-|--------|------|------|
-| 1-5 stars (flat) | Simple, familiar | No differentiation from Yelp |
-| 1-5 stars (weighted by expertise) | Rewards specialization | Complex to explain to users |
-| Binary "recommended" | Simple, decisive | Loses nuance |
-| Multi-axis (food/service/value) | More data | Lower completion rates, more complexity |
-
-**The original Chef's Feed used a curated "recommended" model** — chefs shared dishes they loved, not negative reviews. This is simpler and more positive but limits the review ecosystem.
-
-**Expertise weighting logic:**
-- Chef has specializations: ["pastry", "French"]
-- Restaurant cuisine: "French"
-- Match → weight multiplier of 1.5x on aggregate score
-- No match → 1.0x (still counted, just not boosted)
-- This is computed at query time, not stored
-
-**Decision needed:** Start with 1-5 stars + optional "Chef's Pick" badge (binary recommendation overlay). This gives both quantitative and qualitative signals. Revisit if numeric ratings prove noisy.
+**Remaining complications:**
+- **Discovery signal is weaker.** Without negative reviews, users can't tell if a restaurant is bad — only that it hasn't been recommended. Need to clearly communicate what "no recommendations" means (unknown, not necessarily bad).
+- **Notes content still needs moderation.** Even in positive recommendations, notes could contain inappropriate content, off-topic rants, or spam.
+- **Gaming risk.** Restaurant owners could create fake chef accounts to recommend their own spot. Verification tier + duplicate detection needed.
+- **Expertise weighting still matters.** A pastry chef recommending a croissant should surface higher than a BBQ specialist recommending the same croissant. Computed at query time using chef.specializations vs dish/restaurant cuisine.
 
 ---
 
 ## 6. Legal Considerations
 
-**The problem:** Negative restaurant reviews can lead to legal threats. The platform hosts user-generated content with real business impact.
+**The problem:** Even with positive-only reviews, the platform hosts user-generated content with business impact. Legal compliance is still required.
 
 **Key areas:**
 
-**Defamation:** A review saying "the kitchen was dirty" is an opinion and generally protected. A review saying "the chef committed health code violations" is a factual claim that could be actionable if false. Review guidelines should encourage opinion-framing.
+**Reduced defamation risk:** Positive-only recommendations dramatically reduce legal exposure. No negative reviews means no restaurant owners threatening lawsuits over bad reviews. This is a major advantage of the model.
 
-**Section 230 (US):** Protects platforms from liability for user-generated content. But: doesn't protect against willful blindness to illegal content. Must have a moderation process and respond to valid takedown requests.
+**Remaining legal concerns:**
+- Notes could still contain factual claims about restaurants ("they use organic ingredients" when they don't)
+- Competitive claims ("better than [other restaurant]" — could be seen as disparagement of the other restaurant)
+- Fake recommendations could constitute fraud or unfair business practices
+
+**Section 230 (US):** Still applies. Platform is protected for user-generated content but must respond to valid takedown requests.
 
 **GDPR/Privacy (if expanding internationally):**
 - Chef profiles contain personal data — need consent flows
 - Location data from photos must be stripped
-- Right to deletion must be supported (delete account = delete all reviews)
+- Right to deletion must be supported (delete account = delete all recommendations)
 - Data portability requirements
 
 **Terms of Service must include:**
 - Content ownership: chefs retain ownership but grant platform license to display
-- Prohibited content definitions
+- Positive content policy (no negative reviews, no restaurant bashing in notes)
 - Dispute resolution process
 - Platform right to remove content
 - Indemnification clause
 
 **Decision needed:** Get legal review before launch. At minimum, need ToS, privacy policy, and content guidelines. Budget for legal counsel.
+
+---
+
+## 11. Chef Adoption & Incentives
+
+**The problem:** The platform is worthless without chefs actively posting recommendations. Chefs are busy professionals with no obvious reason to use another app. The cold start problem is severe: no chefs → no content → no users → no reason for chefs to join.
+
+**Why chefs might NOT use this:**
+- Already have Instagram/TikTok for food content with larger audiences
+- No immediate financial incentive
+- Time-consuming to write thoughtful notes and take photos
+- Another app to maintain a profile on
+- Skepticism after Chef's Feed shut down
+
+**What actually motivates culinary professionals:**
+
+| Motivation | How to leverage it |
+|-----------|-------------------|
+| **Professional reputation** | Verified profile acts as a culinary resume. "Recommended by 47 chefs" on their portfolio. |
+| **Peer recognition** | Chefs care deeply what other chefs think. "Your rec was saved by Chef [Name]" is powerful. |
+| **Discovery of new spots** | Chefs eat out constantly. A trusted feed of peer recommendations is genuinely useful to them. |
+| **Supporting the industry** | Positive-only model means recommending = supporting fellow chefs and restaurants. |
+| **Portfolio building** | Exportable recommendation portfolio for job applications, media appearances, consulting. |
+
+**Adoption strategies (phased):**
+
+**Phase 1 — Seed content (pre-launch):**
+- Partner with 20-50 chefs in one city. Hand-hold them through onboarding.
+- Pre-populate their first 5-10 recommendations from interviews/conversations.
+- Make it feel exclusive — "invite-only for culinary professionals."
+
+**Phase 2 — Organic growth:**
+- Let seed chefs invite other chefs (referral with context: "Chef [Name] invited you")
+- "Chef of the Month" spotlights with social media cross-promotion
+- Notify chefs when their recommendations are saved/liked by other chefs
+
+**Phase 3 — Value exchange:**
+- Professional portfolio features (exportable, embeddable on personal sites)
+- Analytics: "Your recommendations drove X views to [Restaurant]" — useful for consulting chefs
+- Restaurant partnerships: restaurants offer perks (priority seating, tastings) to active recommending chefs — BUT this must not influence what gets recommended
+
+**Anti-patterns to avoid:**
+- Don't pay per recommendation — creates spam incentive
+- Don't gamify with points/leaderboards — cheapens expert opinions
+- Don't require posting frequency — chefs will churn if it feels like homework
+
+---
+
+## 12. Monetization Strategy
+
+**The problem:** Revenue is needed to sustain the platform, but must not compromise the recommendation integrity that is the entire value proposition.
+
+**Viable revenue streams:**
+
+### Tier 1 — Low risk to integrity
+| Stream | Description | Revenue potential |
+|--------|-------------|-------------------|
+| **Premium chef profiles** | Enhanced portfolio: custom URL, analytics dashboard, PDF export, embed widget for personal site | $5-15/month per chef |
+| **Restaurant analytics** | Read-only dashboard for restaurant owners: how many chefs recommended them, trending dishes, visit patterns | $50-200/month per restaurant |
+| **Affiliate reservations** | Deep link to OpenTable/Resy when user wants to visit a recommended restaurant. Earn commission. | Per-booking commission |
+
+### Tier 2 — Medium risk, needs guardrails
+| Stream | Description | Risk |
+|--------|-------------|------|
+| **Sponsored discovery** | Restaurants pay to appear in "Discover" section (NOT in the main feed). Clearly labeled "Sponsored." | Users may distrust sponsored listings |
+| **Featured chef partnerships** | Brand deals for chefs (kitchenware, ingredients). Platform takes cut. Must be clearly labeled. | Could feel like ads in the feed |
+
+### Tier 3 — Do not build (integrity risk)
+- Restaurants paying to boost their recommendation visibility
+- Restaurants paying to suppress competitor recommendations
+- Pay-per-recommendation for chefs
+- Unlocking "premium" recommendations behind a consumer paywall
+
+**Architectural principle:** Revenue code and recommendation ranking code must live in completely separate modules. No shared database tables for scoring. This makes it structurally impossible for monetization to leak into recommendation integrity, not just a policy decision.
 
 ---
 

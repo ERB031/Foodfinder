@@ -47,7 +47,7 @@ All endpoints are versioned. Breaking changes require a new version.
 | GET | `/chefs/me` | Get own profile | 🔒 |
 | PUT | `/chefs/me` | Update own profile | 🔒 |
 | GET | `/chefs/:id` | Get chef profile by ID | - |
-| GET | `/chefs/:id/reviews` | Get chef's reviews (paginated) | - |
+| GET | `/chefs/:id/recommendations` | Get chef's recommendations (paginated) | - |
 | GET | `/chefs/:id/followers` | Get chef's followers (paginated) | - |
 | GET | `/chefs/:id/following` | Get who chef follows (paginated) | - |
 | POST | `/chefs/:id/follow` | Follow a chef | 🔒 |
@@ -62,7 +62,7 @@ All endpoints are versioned. Breaking changes require a new version.
 | GET | `/restaurants/:id` | Get restaurant details | - |
 | POST | `/restaurants` | Submit new restaurant | 🔒 |
 | GET | `/restaurants/:id/dishes` | Get dishes at restaurant | - |
-| GET | `/restaurants/:id/reviews` | Get reviews for restaurant (paginated) | - |
+| GET | `/restaurants/:id/recommendations` | Get recommendations for restaurant (paginated) | - |
 | GET | `/restaurants/nearby` | Get restaurants near lat/lng | - |
 
 **Query params for GET /restaurants:**
@@ -78,46 +78,46 @@ All endpoints are versioned. Breaking changes require a new version.
 |--------|------|-------------|------|
 | GET | `/dishes/:id` | Get dish details | - |
 | POST | `/restaurants/:id/dishes` | Create dish at restaurant | 🔒 |
-| GET | `/dishes/:id/reviews` | Get reviews for a specific dish (paginated) | - |
+| GET | `/dishes/:id/recommendations` | Get recommendations for a specific dish (paginated) | - |
 
-### Reviews
+### Recommendations
 
 | Method | Path | Description | Auth |
 |--------|------|-------------|------|
-| POST | `/reviews` | Create a review | 🔒 |
-| GET | `/reviews/:id` | Get review details | - |
-| PUT | `/reviews/:id` | Update own review | 🔒 |
-| DELETE | `/reviews/:id` | Delete own review | 🔒 |
-| POST | `/reviews/:id/flag` | Flag review for moderation | 🔒 |
-| POST | `/reviews/:id/like` | Like a review | 🔒 |
-| DELETE | `/reviews/:id/like` | Unlike a review | 🔒 |
+| POST | `/recommendations` | Create a recommendation (positive only) | 🔒 |
+| GET | `/recommendations/:id` | Get recommendation details | - |
+| PUT | `/recommendations/:id` | Update own recommendation | 🔒 |
+| DELETE | `/recommendations/:id` | Delete own recommendation | 🔒 |
+| POST | `/recommendations/:id/flag` | Flag for moderation | 🔒 |
+| POST | `/recommendations/:id/like` | Like a recommendation | 🔒 |
+| DELETE | `/recommendations/:id/like` | Unlike a recommendation | 🔒 |
 
-**POST /reviews request body:**
+**POST /recommendations request body:**
 ```json
 {
   "restaurant_id": "uuid",
   "dish_id": "uuid | null",
-  "rating": 3,
-  "title": "Amazing ramen",
-  "body": "The tonkotsu broth was rich and...",
-  "visit_date": "2026-03-28",
-  "is_chefs_pick": false
+  "dish_name": "string | null (creates dish if dish_id is null)",
+  "notes": "The tonkotsu broth is the best in the city. Ask for extra chashu and the spicy miso on the side.",
+  "visit_date": "2026-03-28"
 }
 ```
+
+**Note:** No rating field. The recommendation itself is the endorsement. Notes provide context.
 
 ### Photos
 
 | Method | Path | Description | Auth |
 |--------|------|-------------|------|
-| POST | `/reviews/:id/photos/presign` | Get presigned S3 upload URL(s) | 🔒 |
-| POST | `/reviews/:id/photos/confirm` | Confirm upload complete, attach to review | 🔒 |
-| DELETE | `/reviews/:id/photos/:photoId` | Remove photo from review | 🔒 |
+| POST | `/recommendations/:id/photos/presign` | Get presigned S3 upload URL(s) | 🔒 |
+| POST | `/recommendations/:id/photos/confirm` | Confirm upload complete, attach to recommendation | 🔒 |
+| DELETE | `/recommendations/:id/photos/:photoId` | Remove photo from recommendation | 🔒 |
 
 **Upload flow:**
-1. Client calls `POST /reviews/:id/photos/presign` with `{ count: 3, content_types: ["image/jpeg", "image/jpeg", "image/png"] }`
+1. Client calls `POST /recommendations/:id/photos/presign` with `{ count: 3, content_types: ["image/jpeg", "image/jpeg", "image/png"] }`
 2. API returns array of `{ upload_url, storage_key }` (presigned S3 PUT URLs)
 3. Client uploads directly to S3 using presigned URLs
-4. Client calls `POST /reviews/:id/photos/confirm` with `{ storage_keys: [...], alt_texts: [...] }`
+4. Client calls `POST /recommendations/:id/photos/confirm` with `{ storage_keys: [...], alt_texts: [...] }`
 5. API triggers background processing (resize, compress, moderate)
 
 ### Feed
@@ -125,8 +125,8 @@ All endpoints are versioned. Breaking changes require a new version.
 | Method | Path | Description | Auth |
 |--------|------|-------------|------|
 | GET | `/feed` | Get personalized feed | 🔒 |
-| GET | `/feed/trending` | Get trending reviews (no auth required) | - |
-| GET | `/feed/nearby` | Get reviews near location | - |
+| GET | `/feed/trending` | Get trending recommendations (no auth required) | - |
+| GET | `/feed/nearby` | Get recommendations near location | - |
 
 **Query params for GET /feed:**
 - `cursor`, `limit` — pagination

@@ -26,11 +26,12 @@ Foodfinder is a mobile-first platform where culinary professionals review restau
 
 ## Domain Concepts
 - **Chef** — A verified culinary professional (broad definition). Has a credential type and verification tier.
-- **Review** — A chef's assessment of a restaurant or specific dish. Includes rating (1-5), text, and optional photos.
+- **Recommendation** — A positive-only review. Chefs share what they love — no negative reviews. Includes notes (free-text commentary) and optional photos.
+- **Dish Recommendation** — Chefs recommend specific dishes, not just restaurants. Dishes are the atomic unit of content.
 - **Restaurant** — A dining establishment with location, cuisine type, and price range.
-- **Dish** — A specific menu item at a restaurant. Created organically through reviews.
-- **Feed** — The primary discovery surface. Shows reviews from followed chefs, trending reviews, and nearby reviews.
-- **Chef's Pick** — A binary "recommended" badge on reviews (in addition to numeric rating).
+- **Dish** — A specific menu item at a restaurant. Created organically through recommendations.
+- **Feed** — The primary discovery surface. Shows recommendations from followed chefs, trending dishes, and nearby finds.
+- **Notes** — Free-text commentary attached to a recommendation. Why the chef loves this dish, what to order, tips for visiting.
 
 ## Conventions
 - **Commits:** Use conventional commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`)

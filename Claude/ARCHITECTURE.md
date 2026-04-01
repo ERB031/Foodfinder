@@ -35,20 +35,22 @@ Foodfinder is a mobile-first platform where culinary professionals review restau
 ### 2. Chef Profiles
 - Bio, credentials, specializations, profile photo
 - Verification status and history
-- Review portfolio and statistics
+- Recommendation portfolio and statistics
 - Follow/follower relationships
 
 ### 3. Restaurant Data Layer
 - Restaurant records with location (PostGIS for geospatial queries)
-- Dish records tied to restaurants
+- Dish records tied to restaurants (created organically through recommendations)
 - Data sourcing pipeline (API imports + user submissions + manual curation)
 - Staleness detection and refresh jobs
 
-### 4. Review Pipeline
-- Create/edit/delete reviews (text + rating + photos)
-- Reviews link to a restaurant and optionally a specific dish
+### 4. Recommendation Pipeline
+- Positive-only: chefs recommend what they love (no negative reviews, no numeric ratings)
+- Create/edit/delete recommendations (notes + photos)
+- Recommendations link to a restaurant and optionally a specific dish
+- Dish recommendation is the primary content unit — chefs recommend specific dishes
+- Notes provide context: why they love it, what to order, tips for visiting
 - Moderation queue: automated screening → human review for flagged content
-- Edit history tracking
 
 ### 5. Media Pipeline
 - Photo upload via presigned S3 URLs (client uploads directly to S3)
@@ -58,7 +60,7 @@ Foodfinder is a mobile-first platform where culinary professionals review restau
 
 ### 6. Feed Engine
 - Primary discovery surface for the app
-- Combines: followed chefs' reviews, trending reviews, geographically relevant reviews
+- Combines: followed chefs' recommendations, trending recommendations, geographically relevant recommendations
 - Scoring: recency × chef authority × engagement × geographic proximity
 - Materialized feed items for read performance (fan-out-on-write at small scale)
 - Pagination: cursor-based, not offset-based
@@ -68,16 +70,16 @@ Foodfinder is a mobile-first platform where culinary professionals review restau
 - Search targets: restaurants (by name, cuisine, location), chefs (by name, specialization), dishes
 - Migrate to dedicated search engine (Meilisearch/Elasticsearch) if performance demands it
 
-## Request Flow (Example: Create Review)
+## Request Flow (Example: Create Recommendation)
 
-1. Mobile app sends `POST /api/reviews` with JWT in Authorization header
+1. Mobile app sends `POST /api/recommendations` with JWT in Authorization header
 2. Auth middleware validates JWT, attaches chef profile to request
-3. Validator middleware checks request body schema
-4. Controller calls ReviewService
-5. ReviewService validates restaurant/dish exist, creates review record
+3. Validator middleware checks request body schema (notes required, positive content)
+4. Controller calls RecommendationService
+5. RecommendationService validates restaurant exists, creates/finds dish if specified, creates recommendation record
 6. If photos attached: returns presigned S3 URLs for upload
 7. Triggers async jobs: update feed items, run content moderation, update restaurant stats
-8. Returns created review to client
+8. Returns created recommendation to client
 
 ## Key Architectural Decisions
 
