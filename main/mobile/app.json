@@ -4,6 +4,37 @@
     "slug": "foodfinder",
     "version": "0.1.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android"]
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "foodfinder",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.foodfinder.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Take photos of dishes to include in your recommendations.",
+        "NSPhotoLibraryUsageDescription": "Select photos of dishes to include in your recommendations.",
+        "NSLocationWhenInUseUsageDescription": "Find restaurants near you."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.foodfinder.app",
+      "permissions": ["CAMERA", "ACCESS_FINE_LOCATION"]
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-image-picker",
+      "expo-location"
+    ]
   }
 }
